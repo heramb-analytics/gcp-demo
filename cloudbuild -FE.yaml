@@ -1,0 +1,30 @@
+steps:
+
+    # doing Feature engineering -- 1st create DAG folder in GCS and upload DAG there
+  - id: Sync github repo to DAGs folder
+    #dir: hello-cloudbuild
+    name: gcr.io/cloud-builders/gsutil
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        gsutil rsync -mrd ./dags gs://to/my/DAGfolder/in/google/storage
+        
+    # setup make sure set up _GSC_BUCKET environment varible ---GCS location where dag is placed
+    
+    
+    # run google sdk to trigger AIRFLOW
+  - id: trigger-airflow
+    #dir: hello-cloudbuild
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        gcloud composer environments run composer-cluster-name --location=your-location --project=project-ID trigger_dag -- AIRFLOW_ID
+        # gcloud composer environments storage dags delete \ 
+        #--environment ENVIRONMENT_NAME \
+        #--location LOCATION \
+        #DAG_NAME.py
+
+ 
